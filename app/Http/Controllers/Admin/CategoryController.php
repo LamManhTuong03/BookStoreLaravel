@@ -15,7 +15,8 @@ class CategoryController extends Controller
 {
     //
     public function  index(){
-        return view('admin.category.index');
+        $categories = Category::all();
+        return view('admin.category.index',compact('categories'));
     }
     public function create(){
         return view('admin.category.create');
@@ -28,12 +29,14 @@ class CategoryController extends Controller
         $category->slug = Str::slug($validatedData['slug']);
         $category->description = $validatedData['description'];
 
+
+        $uploadPath = 'upload/category/';
         if($request->hasFile('image')){
             $file = $request->file('image');
             $ext = $file->getClientOriginalExtension();
             $filename = time().'.'.$ext;
             $file->move('upload/category/', $filename);
-            $category->image = $filename;
+            $category->image = $uploadPath.$filename;
         }
 
 
@@ -60,8 +63,10 @@ class CategoryController extends Controller
         $category->slug = Str::slug($validatedData['slug']);
         $category->description = $validatedData['description'];
 
+
         if($request->hasFile('image')){
 
+            $uploadPath = 'upload/category/';
             $path = 'upload/category/'.$category->image;
             if(File::exists($path)){
                 File::delete($path);
@@ -71,7 +76,7 @@ class CategoryController extends Controller
             $ext = $file->getClientOriginalExtension();
             $filename = time().'.'.$ext;
             $file->move('upload/category/', $filename);
-            $category->image = $filename;
+            $category->image = $uploadPath.$filename;
         }
 
 

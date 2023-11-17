@@ -20,5 +20,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        $this->app->singleton(FrontendAssets::class, function () {
+            return new FrontendAssets();
+        });
+
     }
 }

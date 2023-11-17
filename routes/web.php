@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,6 +24,37 @@ Route::get('/clt',function(){
 Auth::routes();
 
 Route::get('/',[\App\Http\Controllers\Frontend\FrontendController::class,'index']);
+Route::get('/collections',[\App\Http\Controllers\Frontend\FrontendController::class,'categories']);
+Route::get('/collections/{category_slug}',[\App\Http\Controllers\Frontend\FrontendController::class,'products']);
+Route::get('/collections/{category_slug}/{products_slug}',[\App\Http\Controllers\Frontend\FrontendController::class,'productView']);
+
+Route::post('paypal/payment',[\App\Http\Controllers\paypalController::class,'payment'])->name('paypal');
+Route::get('paypal/success',[\App\Http\Controllers\paypalController::class,'success'])->name('payment_success');
+Route::get('paypal/cancel',[\App\Http\Controllers\paypalController::class,'cancel'])->name('payment_cancel');
+
+
+Route::get("/order/{idOrder}", function($idOrder) {
+    $order = Order::findOrFail($idOrder);
+
+    return view('frontend.checkout.index', compact('order'));
+});
+
+Route::post('payment', [\App\Http\Controllers\CheckOutController::class,'checkout'])->name('payment-vnpay');
+
+Route::get('handle-payment', [\App\Http\Controllers\CheckOutController::class,'handlePayment'])->name('handlePayment');
+
+
+
+
+Route::middleware(['auth'])->group(function (){
+    Route::get('wishlist',[\App\Http\Controllers\Frontend\WishlistController::class,'index']);
+    Route::get('cart',[\App\Http\Controllers\Frontend\CartController::class,'index']);
+    Route::get('checkout',[\App\Http\Controllers\Frontend\CheckoutController::class,'index']);
+});
+
+Route::get('thank-you',[\App\Http\Controllers\Frontend\FrontendController::class,'thankyou']);
+
+
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::prefix('admin')->middleware(['auth','isAdmin'])->group(function (){
@@ -56,6 +88,6 @@ Route::prefix('admin')->middleware(['auth','isAdmin'])->group(function (){
         Route::get('product-image/{product_image_id}/delete','destroyImage');
     });
 
-    Route::get('/brands',App\Livewire\Admin\Brand\Index::class);
+    Route::get('/brands', \App\Livewire\Admin\Brand\Index::class);
 
 });
